@@ -1,0 +1,494 @@
+{
+  "info": {
+    "name": "Prueba 1 - Programación Web",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Usuarios",
+      "item": [
+        {
+          "name": "Crear usuario 1 (Juan Carlos) -> copiar id como USER_1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"juan carlos\",\n  \"lastname\": \"pérez mora\",\n  \"age\": 30\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear usuario 2 (Ana) -> copiar id como USER_2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"ANA\",\n  \"age\": 25\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear usuario 3 (Sin Pagos) -> copiar id como USER_3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"sin pagos\",\n  \"age\": 50\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/users"
+          }
+        },
+        {
+          "name": "Consultar USER_1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/users/PASTE_USER_1_ID"
+          }
+        },
+        {
+          "name": "Actualizar USER_2",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users/PASTE_USER_2_ID",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lastname\": \"gómez\",\n  \"age\": 26\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 edad 0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\",\n  \"age\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 edad 116",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\",\n  \"age\": 116\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 edad decimal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\",\n  \"age\": 20.5\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 sin nombre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 20\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 nombre vacio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"   \",\n  \"age\": 20\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 404 usuario no existe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/users/no-existe"
+          }
+        },
+        {
+          "name": "ERROR 400 PUT edad 200",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/users/PASTE_USER_1_ID",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 200\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Pagos",
+      "item": [
+        {
+          "name": "Crear pago 1 USD -> copiar id como PAYMENT_1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"amount\": 1000,\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear pago 2 CRC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"amount\": 25000.5,\n  \"moneda\": \"CRC\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear pago 3 -> copiar id como PAYMENT_3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_2_ID\",\n  \"amount\": 100,\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Listar pagos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/payments"
+          }
+        },
+        {
+          "name": "Consultar PAYMENT_1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/payments/PASTE_PAYMENT_1_ID"
+          }
+        },
+        {
+          "name": "Actualizar PAYMENT_3",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments/PASTE_PAYMENT_3_ID",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 200,\n  \"moneda\": \"CRC\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar PAYMENT_3",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "http://localhost:8000/payments/PASTE_PAYMENT_3_ID"
+          }
+        },
+        {
+          "name": "ERROR 404 PAYMENT_3 ya eliminado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/payments/PASTE_PAYMENT_3_ID"
+          }
+        },
+        {
+          "name": "ERROR 400 moneda EUR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"amount\": 10,\n  \"moneda\": \"EUR\"\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 moneda en minuscula",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"amount\": 10,\n  \"moneda\": \"usd\"\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 monto 100001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"amount\": 100001,\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 monto negativo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"amount\": -5,\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 sin monto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"PASTE_USER_1_ID\",\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 404 usuario no existe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"no-existe\",\n  \"amount\": 10,\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        },
+        {
+          "name": "ERROR 400 user_id numerico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "http://localhost:8000/payments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 5,\n  \"amount\": 10,\n  \"moneda\": \"USD\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Reportes",
+      "item": [
+        {
+          "name": "Pagos por usuario (LEFT JOIN)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/reports/payments-per-user"
+          }
+        },
+        {
+          "name": "Pagos con IVA (net_amount)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/reports/payments-with-iva"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Eliminar usuario (cascada)",
+      "item": [
+        {
+          "name": "Eliminar USER_1",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "http://localhost:8000/users/PASTE_USER_1_ID"
+          }
+        },
+        {
+          "name": "Listar pagos (sin los de USER_1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/payments"
+          }
+        },
+        {
+          "name": "Pagos por usuario (solo Ana y Sin Pagos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/reports/payments-per-user"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Logs",
+      "item": [
+        {
+          "name": "Listar logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "http://localhost:8000/logs"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,12 +1,25 @@
 import { randomUUID } from 'node:crypto';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { SqliteService } from '../sqlite/sqlite.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 // Columns that can be changed through UpdateUserDto
-const UPDATABLE_COLUMNS = ['name', 'email', 'password'] as const;
+const UPDATABLE_COLUMNS = ['name', 'lastname', 'age'] as const;
+
+// Capitalizes every word: "juan carlos" -> "Juan Carlos"
+function capitalize(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (letter) => letter.toUpperCase());
+}
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -19,53 +32,23 @@ export class UsersService implements OnModuleInit {
         id TEXT PRIMARY KEY NOT NULL,
         name TEXT NOT NULL,
         lastname TEXT,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        age INTEGER,
-        role TEXT NOT NULL DEFAULT 'Reader'
+        age INTEGER NOT NULL CHECK (age BETWEEN 1 AND 115)
       )
     `);
   }
 
   async create(createUserDto: CreateUserDto) {
-    const { email, name, password } = createUserDto;
+    const { name, lastname, age } = createUserDto;
 
-    // Validate email, name and password
-    if (!email || !name || !password) {
-      throw new Error('Email, name and password are required');
-    }
-
-    // Validate that the password is strong (at last 8 chars, one mayus, one digit and one number) and document with comments
-    if (
-      password.length < 8 ||
-      !password.match(/[A-Z]/) ||
-      !password.match(/[0-9]/) ||
-      !password.match(/[^A-Za-z0-9]/)
-    ) {
-      throw new Error(
-        'Password must be at least 8 characters long and contain at least one uppercase letter, one digit and one special character',
-      );
-    }
-
-    // Validate that the email is in a valid format with a regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw new Error('Email is not valid');
-    }
-
-    // Validate that the email is not already in use
-    const emailExists = this.sqlite.get<User>(
-      'SELECT id FROM user WHERE email = ?',
-      [email],
-    );
-    if (emailExists) {
-      throw new Error('Email already exists');
-    }
+    // Validate name (required), lastname (optional) and age (required)
+    this.validateName(name);
+    this.validateLastname(lastname);
+    this.validateAge(age);
 
     const id = randomUUID();
     this.sqlite.run(
-      'INSERT INTO user (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)',
-      [id, name, email, password, 'Reader'],
+      'INSERT INTO user (id, name, lastname, age) VALUES (?, ?, ?, ?)',
+      [id, capitalize(name), lastname ? capitalize(lastname) : null, age],
     );
 
     return this.findOne(id);
@@ -81,7 +64,7 @@ export class UsersService implements OnModuleInit {
     ]);
 
     if (!userExist) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return userExist;
@@ -91,14 +74,32 @@ export class UsersService implements OnModuleInit {
     // Throws if the user does not exist
     await this.findOne(id);
 
+    const { name, lastname, age } = updateUserDto;
+
+    // Only validate the fields that were sent
+    if (name !== undefined) this.validateName(name);
+    if (lastname !== undefined) this.validateLastname(lastname);
+    if (age !== undefined) this.validateAge(age);
+
+    const values = {
+      name: name !== undefined ? capitalize(name) : undefined,
+      lastname:
+        lastname !== undefined
+          ? lastname
+            ? capitalize(lastname)
+            : null
+          : undefined,
+      age,
+    };
+
     const columns = UPDATABLE_COLUMNS.filter(
-      (column) => updateUserDto[column] !== undefined,
+      (column) => values[column] !== undefined,
     );
 
     if (columns.length > 0) {
       this.sqlite.run(
         `UPDATE user SET ${columns.map((column) => `${column} = ?`).join(', ')} WHERE id = ?`,
-        [...columns.map((column) => updateUserDto[column] ?? null), id],
+        [...columns.map((column) => values[column] ?? null), id],
       );
     }
 
@@ -111,5 +112,37 @@ export class UsersService implements OnModuleInit {
     this.sqlite.run('DELETE FROM user WHERE id = ?', [id]);
 
     return user;
+  }
+
+  // Name is required and must be a non-empty string
+  private validateName(name: unknown) {
+    if (typeof name !== 'string' || name.trim() === '') {
+      throw new BadRequestException('Name is required');
+    }
+  }
+
+  // Lastname is optional, but if it is sent it must be a string
+  private validateLastname(lastname: unknown) {
+    if (
+      lastname !== undefined &&
+      lastname !== null &&
+      typeof lastname !== 'string'
+    ) {
+      throw new BadRequestException('Lastname must be a string');
+    }
+  }
+
+  // Age is required and must be an integer between 1 and 115
+  private validateAge(age: unknown) {
+    if (
+      typeof age !== 'number' ||
+      !Number.isInteger(age) ||
+      age < 1 ||
+      age > 115
+    ) {
+      throw new BadRequestException(
+        'Age is required and must be an integer between 1 and 115',
+      );
+    }
   }
 }
